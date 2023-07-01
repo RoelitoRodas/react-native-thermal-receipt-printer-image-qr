@@ -210,7 +210,7 @@ public class BLEPrinterAdapter implements PrinterAdapter {
     @Override
     public void printImageData(String imageUrl, int imageWidth, int imageHeight, Callback errorCallback) {
         
-
+        final Bitmap bitmapImage = getBitmapFromURL(imageUrl);
         if (bitmapImage == null) {
             errorCallback.invoke("image not found");
             return;
@@ -226,7 +226,7 @@ public class BLEPrinterAdapter implements PrinterAdapter {
             @Override
             public void run() {
                 try {
-                     final Bitmap bitmapImage = getBitmapFromURL(imageUrl);
+                    
                     final Bitmap monoBitmap=convertToMonochrome(bitmapImage);
                     final Bitmap resizedBitmap=resizeBitmap(monoBitmap,imageWidth,imageHeight);
 
