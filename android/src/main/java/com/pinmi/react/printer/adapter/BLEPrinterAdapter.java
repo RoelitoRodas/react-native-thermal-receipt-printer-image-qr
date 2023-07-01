@@ -5,8 +5,15 @@ import static com.pinmi.react.printer.adapter.UtilsImage.recollectSlice;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -219,7 +226,7 @@ public class BLEPrinterAdapter implements PrinterAdapter {
             @Override
             public void run() {
                 try {
-                     final Bitmap bitmapImage = getBitmapFromURL(url);
+                     final Bitmap bitmapImage = getBitmapFromURL(imageUrl);
                     final Bitmap monoBitmap=convertToMonochrome(bitmapImage);
                     final Bitmap resizedBitmap=resizeBitmap(monoBitmap,imageWidth,imageHeight);
 
