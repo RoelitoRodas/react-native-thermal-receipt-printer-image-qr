@@ -222,9 +222,7 @@ public class BLEPrinterAdapter implements PrinterAdapter {
         }
 
         final BluetoothSocket socket = this.mBluetoothSocket;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+       
                 try {
                     
                     final Bitmap monoBitmap=convertToMonochrome(bitmapImage);
@@ -251,8 +249,7 @@ public class BLEPrinterAdapter implements PrinterAdapter {
                     Log.e(LOG_TAG, "failed to print data");
                     e.printStackTrace();
                 }
-            }
-        }).start();
+            
     }
 
     @Override
