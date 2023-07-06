@@ -241,10 +241,9 @@ public class BLEPrinterAdapter implements PrinterAdapter {
                     //outputStream.write(SELECT_BIT_IMAGE_MODE);
                     printerOutputStream.write(imageData);
                     printerOutputStream.write(FEED_LINE);
-                    printerOutputStream.write(FEED_LINE);
-                    printerOutputStream.write(FEED_LINE);
+                    
                     printerOutputStream.flush();
-                    printerOutputStream.close();
+                    //printerOutputStream.close();
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "failed to print data");
                     e.printStackTrace();
@@ -254,6 +253,7 @@ public class BLEPrinterAdapter implements PrinterAdapter {
 
     @Override
     public void printImageBase64(final Bitmap bitmapImage, int imageWidth, int imageHeight, Callback errorCallback) {
+        
         if (bitmapImage == null) {
             errorCallback.invoke("image not found");
             return;
@@ -265,38 +265,26 @@ public class BLEPrinterAdapter implements PrinterAdapter {
         }
 
         final BluetoothSocket socket = this.mBluetoothSocket;
+       
+                try {
+                    
+                    final Bitmap monoBitmap=convertToMonochrome(bitmapImage);
+                    final Bitmap resizedBitmap=resizeBitmap(monoBitmap,imageWidth,imageHeight);
 
-        try {
-            int[][] pixels = getPixelsSlow(bitmapImage, imageWidth, imageHeight);
+                    byte[] imageData=decodeBitmap(resizedBitmap);
+                    OutputStream printerOutputStream = socket.getOutputStream();
 
-            OutputStream printerOutputStream = socket.getOutputStream();
-
-            printerOutputStream.write(SET_LINE_SPACE_24);
-            printerOutputStream.write(CENTER_ALIGN);
-
-            for (int y = 0; y < pixels.length; y += 24) {
-                // Like I said before, when done sending data,
-                // the printer will resume to normal text printing
-                printerOutputStream.write(SELECT_BIT_IMAGE_MODE);
-                // Set nL and nH based on the width of the image
-                printerOutputStream.write(
-                        new byte[] { (byte) (0x00ff & pixels[y].length), (byte) ((0xff00 & pixels[y].length) >> 8) });
-                for (int x = 0; x < pixels[y].length; x++) {
-                    // for each stripe, recollect 3 bytes (3 bytes = 24 bits)
-                    printerOutputStream.write(recollectSlice(y, x, pixels));
+                    printerOutputStream.write(ESC_ALIGN_CENTER);
+                    //outputStream.write(SELECT_BIT_IMAGE_MODE);
+                    printerOutputStream.write(imageData);
+                    printerOutputStream.write(FEED_LINE);
+                    
+                    printerOutputStream.flush();
+                    //printerOutputStream.close();
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "failed to print data");
+                    e.printStackTrace();
                 }
-
-                // Do a line feed, if not the printing will resume on the same line
-                printerOutputStream.write(LINE_FEED);
-            }
-            printerOutputStream.write(SET_LINE_SPACE_32);
-            printerOutputStream.write(LINE_FEED);
-
-            printerOutputStream.flush();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "failed to print data");
-            e.printStackTrace();
-        }
     }
 
     public static Bitmap getBitmapFromURL(String src) {
